@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-// TODO make a way to keep the images rather than refetching them ....
-
 let page = '2021_storming_of_the_United_States_Capitol'
 //let page = 'User:Addshore/foo'
 let imageSeconds = 1/30
@@ -14,15 +12,15 @@ var bot = require('nodemw');
 var async = require('async');
 var del = require('del');
 var videoshow = require('videoshow');
-// var gifshot = require('gifshot');
-// var base64ImageToFile = require('base64image-to-file');
 
-const dir = './data';
-
-//fs.rmdirSync(dir, { recursive: true });
-del.sync(dir)
-fs.mkdirSync(dir);
-console.log("Cleaned data directory")
+let dir = './data';
+try{
+    fs.mkdirSync(dir);
+}catch(e){}
+dir = dir + "/" + page;
+try{
+    fs.mkdirSync(dir);
+}catch(e){}
 
 var client = new bot({
   protocol: 'https',
@@ -46,7 +44,7 @@ function handleArticleRevisions(err, data) {
 
     console.log("Got " + data.length + " revisions")
 
-    async.eachLimit(data, 10, handleArticleRevision, function(err) {
+    async.eachLimit(data, 20, handleArticleRevision, function(err) {
         if(err) throw err;
 
         var screenshots = fs.readdirSync(dir + "/");
@@ -82,25 +80,6 @@ function handleArticleRevisions(err, data) {
                 console.error('Video created in:', output)
             })
 
-        // var base64ImageToFile = require('base64image-to-file');
-        // gifshot.createGIF({
-        //     'images': [screenshots]
-        //   },function(obj) {
-        //     if(!obj.error) {
-        //         base64ImageToFile(obj.image, '.', dir + '/' + page.replace(/[|&;$%@"<>()+,\/:]/g, "") + '.gif',
-        //             function(err) {
-        //             if (err) {
-        //                 console.log(err)
-        //             } else {
-        //                 console.log("Gif should be saved")
-        //             }
-        //             }
-        //         );
-        //     } else {
-        //         console.log(obj)
-        //     }
-        //   });
-
     });
 }
 
@@ -108,8 +87,6 @@ function handleArticleRevision(revision, doneCallback) {
     let revisionUrl = "https://en.wikipedia.org/w/index.php?title=" + page + "&oldid=" + revision.revid;
     let cleanPage = page.replace(/[|&;$%@"<>()+,\/:]/g, "");
     let saveAs = cleanPage + "@" + revision.revid;
-
-    console.log("Processing: " + revisionUrl);
 
     getScreenshotOfPage(revisionUrl, saveAs, doneCallback)
 }
@@ -129,28 +106,20 @@ function getScreenshotOfPage(url, saveAs, doneCallback){
           },
     };
 
+    var fileToSave = dir + "/" + saveAs + ".png";
+
+    if (fs.existsSync(fileToSave)) {
+        console.log('Screenshot already retrieved: ' + fileToSave);
+        doneCallback();
+        return
+    }
+
     webshot(url, dir + "/" + saveAs + ".png", optionsSelector, function(err) {
         if (err) {
           console.log('Screenshot failed!');
         }
+        console.log('Got screenshot from: ' + url);
         doneCallback();
       });
 
-    // request({
-    //     url: "https://api.apiflash.com/v1/urltoimage",
-    //     encoding: "binary",
-    //     qs: {
-    //         access_key: "XXX",
-    //         url: url
-    //     }
-    // }, (error, response, body) => {
-    //     if (error) {
-    //         console.log(error);
-    //     } else {
-    //         fs.writeFile(dir + saveAs + ".jpeg", body, "binary", error => {
-    //             console.log(error);
-    //         });
-    //     }
-    //     doneCallback();
-    // });
 }
