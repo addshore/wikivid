@@ -17,3 +17,31 @@ Fixed height video:
 ```sh
 cat ./data/2021_storming_of_the_United_States_Capitol/*.png | ffmpeg -r 30 -s 1920x1080 -f image2pipe -vcodec png -pix_fmt yuv420p -i - output.mp4
 ```
+
+**API**
+
+You can run the API with something like:
+
+```sh
+PORT=8125 node api.js
+```
+
+**Heroku**
+
+Run locally with:
+
+```sh
+heroku local web
+```
+
+Create an app:
+
+```sh
+heroku create
+```
+
+Push the app:
+
+```sh
+git push heroku main
+```

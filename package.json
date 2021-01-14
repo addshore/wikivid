@@ -1,5 +1,5 @@
 {
-  "name": "wikigif",
+  "name": "wikivid",
   "version": "0.0.0",
   "description": "",
   "main": "main.js",
@@ -12,5 +12,8 @@
     "gifshot": "^0.4.5",
     "nodemw": "^0.13.0",
     "webshot": "^0.18.0"
+  },
+  "engines": {
+    "node": "10.x"
   }
 }
