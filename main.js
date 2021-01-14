@@ -5,14 +5,11 @@ let firstDateToRender = new Date( '2021-01-06T18:34:29Z' )
 let lastDateToRender = new Date( '2021-01-07T00:00:01Z' )// up to midnight..
 //let lastDateToRender = new Date( '2021-01-07T18:34:29Z' )// 24 hours later
 //let page = 'User:Addshore/foo'
-let imageSeconds = 1/30
-// For the US page this means 2.6 mins...
-// TODO maybe we should skip some revisions..
 
-var webshot = require('webshot');
 var fs = require('fs');
 var bot = require('nodemw');
 var async = require('async');
+const screenshot = require("./src/screenshot");
 
 let dir = './data';
 try{
@@ -61,43 +58,7 @@ function handleArticleRevision(revision, doneCallback) {
 
     let revisionUrl = "https://en.wikipedia.org/w/index.php?title=" + page + "&oldid=" + revision.revid;
     let cleanPage = page.replace(/[|&;$%@"<>()+,\/:]/g, "");
-    let saveAs = cleanPage + "@" + revision.revid;
+    let saveAs = dir + "/" + cleanPage + "@" + revision.revid + ".png";
 
-    getScreenshotOfPage(revisionUrl, saveAs, doneCallback)
-}
-
-function getScreenshotOfPage(url, saveAs, doneCallback){
-    // TODO hide annoying elements?
-    const optionsSelector = {
-        // If we want to limit what we grab we could use this
-        //captureSelector: '#content',
-        customCSS: '.mw-revision, .warningbox { display:none; }',
-        // wait a short time to make sure the page looks as ready as possible
-        renderDelay: 200,
-        windowSize: {
-            width: 1920,
-            height: 1080
-          },
-          shotSize: {
-            width: 'window',
-            height: 'all'
-          },
-    };
-
-    var fileToSave = dir + "/" + saveAs + ".png";
-
-    if (fs.existsSync(fileToSave)) {
-        console.log('Screenshot already retrieved: ' + fileToSave);
-        doneCallback();
-        return
-    }
-
-    webshot(url, dir + "/" + saveAs + ".png", optionsSelector, function(err) {
-        if (err) {
-          console.log('Screenshot failed!');
-        }
-        console.log('Got screenshot from: ' + url);
-        doneCallback();
-      });
-
+    screenshot.ofPage(revisionUrl, saveAs, doneCallback)
 }
