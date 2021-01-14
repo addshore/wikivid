@@ -1,6 +1,9 @@
 #! /usr/bin/env node
 
 let page = '2021_storming_of_the_United_States_Capitol'
+let firstDateToRender = new Date( '2021-01-06T18:34:29Z' )
+let lastDateToRender = new Date( '2021-01-07T06:34:29Z' )// 12 hours later
+//let lastDateToRender = new Date( '2021-01-07T18:34:29Z' )// 24 hours later
 //let page = 'User:Addshore/foo'
 let imageSeconds = 1/30
 // For the US page this means 2.6 mins...
@@ -44,7 +47,7 @@ function handleArticleRevisions(err, data) {
 
     console.log("Got " + data.length + " revisions")
 
-    async.eachLimit(data, 20, handleArticleRevision, function(err) {
+    async.eachLimit(data, 10, handleArticleRevision, function(err) {
         if(err) throw err;
 
         var screenshots = fs.readdirSync(dir + "/");
@@ -67,6 +70,7 @@ function handleArticleRevisions(err, data) {
             pixelFormat: 'yuv420p'
           }
 
+          console.log("Generating video... (this may take some time)");
           videoshow(screenshots, videoOptions)
             .save(dir + '/' + page.replace(/[|&;$%@"<>()+,\/:]/g, "") + '.mp4')
             .on('start', function (command) {
@@ -84,6 +88,13 @@ function handleArticleRevisions(err, data) {
 }
 
 function handleArticleRevision(revision, doneCallback) {
+  let revDate = new Date(revision.timestamp);
+    if( revDate < firstDateToRender || revDate > lastDateToRender ) {
+      console.log("Skipping " + revision.revid + " as out of date range.")
+      doneCallback()
+      return;
+    }
+
     let revisionUrl = "https://en.wikipedia.org/w/index.php?title=" + page + "&oldid=" + revision.revid;
     let cleanPage = page.replace(/[|&;$%@"<>()+,\/:]/g, "");
     let saveAs = cleanPage + "@" + revision.revid;
