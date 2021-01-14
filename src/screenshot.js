@@ -1,8 +1,7 @@
 var webshot = require('webshot');
 var fs = require('fs');
 
-function ofPage(url, saveAs, doneCallback){
-    // TODO hide annoying elements?
+function ofPage(source, url, saveAs, doneCallback){
     const optionsSelector = {
         // If we want to limit what we grab we could use this
         //captureSelector: '#content',
@@ -21,7 +20,7 @@ function ofPage(url, saveAs, doneCallback){
 
     // TODO allow some way to force over it?
     if (fs.existsSync(saveAs)) {
-        console.log('Screenshot already retrieved: ' + saveAs);
+        console.log('Using cached local screenshot for: ' + saveAs);
         doneCallback();
         return
     }
@@ -31,7 +30,6 @@ function ofPage(url, saveAs, doneCallback){
           console.log('Screenshot failed!');
           console.log(err);
         }
-        console.log('Got screenshot from: ' + url);
         doneCallback();
       });
 

@@ -35,7 +35,7 @@ http.createServer(function (request, response) {
     let saveAs = '/tmp/wikigif-' + urlToFetch + ".png"
     saveAs = saveAs.replace(/[/\\?%*:|"<>]/g, '-')
 
-    screenshot.ofPage(urlToFetch,saveAs,screenshotGrabbed)
+    screenshot.ofPage("local",urlToFetch,saveAs,screenshotGrabbed)
 
     function screenshotGrabbed() {
         fs.readFile(saveAs, function(error, content) {

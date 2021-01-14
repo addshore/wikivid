@@ -1,15 +1,20 @@
 #! /usr/bin/env node
 
-let page = '2021_storming_of_the_United_States_Capitol'
-let firstDateToRender = new Date( '2021-01-06T18:34:29Z' )
-let lastDateToRender = new Date( '2021-01-07T00:00:01Z' )// up to midnight..
-//let lastDateToRender = new Date( '2021-01-07T18:34:29Z' )// 24 hours later
-//let page = 'User:Addshore/foo'
+let source = process.argv[2]
+let page = process.argv[3]
+let firstDateToRender = new Date(process.argv[4])
+let lastDateToRender = new Date(process.argv[5])
 
 var fs = require('fs');
 var bot = require('nodemw');
 var async = require('async');
-const screenshot = require("./src/screenshot");
+
+let screenshot
+if(source == 'local') {
+  screenshot = require("./src/screenshot");
+} else {
+  screenshot = require("./src/screenshot-remote")
+}
 
 let dir = './data';
 try{
@@ -60,5 +65,6 @@ function handleArticleRevision(revision, doneCallback) {
     let cleanPage = page.replace(/[|&;$%@"<>()+,\/:]/g, "");
     let saveAs = dir + "/" + cleanPage + "@" + revision.revid + ".png";
 
-    screenshot.ofPage(revisionUrl, saveAs, doneCallback)
+    console.log("Getting screenshot for: " + revisionUrl)
+    screenshot.ofPage(source, revisionUrl, saveAs, doneCallback)
 }
