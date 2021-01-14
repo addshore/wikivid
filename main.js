@@ -13,8 +13,6 @@ var webshot = require('webshot');
 var fs = require('fs');
 var bot = require('nodemw');
 var async = require('async');
-var del = require('del');
-var videoshow = require('videoshow');
 
 let dir = './data';
 try{
@@ -55,35 +53,6 @@ function handleArticleRevisions(err, data) {
             return dir + '/' + file; 
           })
         console.log("Got " + screenshots.length + " screenshots");
-
-        var videoOptions = {
-            fps: 30,
-            loop: imageSeconds, // seconds
-            transition: false,
-            transitionDuration: 1, // seconds
-            videoBitrate: 1024,
-            videoCodec: 'libx264',
-            size: '1920x?',
-            audioBitrate: '128k',
-            audioChannels: 2,
-            format: 'mp4',
-            pixelFormat: 'yuv420p'
-          }
-
-          console.log("Generating video... (this may take some time)");
-          videoshow(screenshots, videoOptions)
-            .save(dir + '/' + page.replace(/[|&;$%@"<>()+,\/:]/g, "") + '.mp4')
-            .on('start', function (command) {
-                console.log('ffmpeg process started:', command)
-            })
-            .on('error', function (err, stdout, stderr) {
-                console.error('Error:', err)
-                console.error('ffmpeg stderr:', stderr)
-            })
-            .on('end', function (output) {
-                console.error('Video created in:', output)
-            })
-
     });
 }
 
